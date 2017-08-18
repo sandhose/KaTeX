@@ -139,6 +139,33 @@ class span {
 
         return markup;
     }
+
+    toHyperscript(h) {
+        const attrs = {};
+
+        // Add the class
+        if (this.classes.length) {
+            attrs.className = createClass(this.classes);
+        }
+
+        attrs.style = {};
+
+        // Add the styles, after hyphenation
+        for (const style in this.style) {
+            if (this.style.hasOwnProperty(style)) {
+                attrs.style[style] = this.style[style];
+            }
+        }
+
+        // Add the attributes
+        for (const attr in this.attributes) {
+            if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+                attrs[attr] = this.attributes[attr];
+            }
+        }
+
+        return h('span', attrs, this.children.map(c => c.toHyperscript(h)));
+    }
 }
 
 /**
@@ -182,6 +209,10 @@ class documentFragment {
         }
 
         return markup;
+    }
+
+    toHyperscript(h) {
+        return this.children.map(c => c.toHyperscript());
     }
 }
 
@@ -329,6 +360,36 @@ class symbolNode {
             markup += escaped;
             markup += "</span>";
             return markup;
+        } else {
+            return escaped;
+        }
+    }
+
+    toHyperscript(h) {
+        let needsSpan = false;
+
+        const attrs = {};
+        if (this.classes.length) {
+            needsSpan = true;
+            attrs.className = createClass(this.classes);
+        }
+
+        attrs.style = {};
+
+        if (this.italic > 0) {
+            needsSpan = true;
+            attrs.style['margin-right'] = this.italic + "em";
+        }
+        for (const style in this.style) {
+            if (this.style.hasOwnProperty(style)) {
+                needsSpan = true;
+                attrs.style[style] = this.style[style];
+            }
+        }
+
+        const escaped = utils.escape(this.value);
+        if (needsSpan) {
+            return h("span", attrs, escaped);
         } else {
             return escaped;
         }

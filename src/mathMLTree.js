@@ -75,6 +75,19 @@ class MathNode {
 
         return markup;
     }
+
+    toHyperscript(h) {
+        const attrs = {};
+
+        // Add the attributes
+        for (const attr in this.attributes) {
+            if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+                attrs[attr] = this.attributes[attr];
+            }
+        }
+
+        return h(this.type, attrs, this.children.map(c => c.toHyperscript(h)));
+    }
 }
 
 /**
@@ -96,6 +109,10 @@ class TextNode {
      * Converts the text node into HTML markup (which is just the text itself).
      */
     toMarkup() {
+        return utils.escape(this.text);
+    }
+
+    toHyperscript() {
         return utils.escape(this.text);
     }
 }

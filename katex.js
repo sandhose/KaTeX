@@ -53,6 +53,13 @@ const renderToString = function(expression, options) {
     return buildTree(tree, expression, settings).toMarkup();
 };
 
+const renderHyperscript = function(expression, options, h) {
+    const settings = new Settings(options);
+
+    const tree = parseTree(expression, settings);
+    return buildTree(tree, expression, settings).toHyperscript(h);
+};
+
 /**
  * Parse an expression and return the parse tree.
  */
@@ -64,6 +71,7 @@ const generateParseTree = function(expression, options) {
 module.exports = {
     render: render,
     renderToString: renderToString,
+    renderHyperscript: renderHyperscript,
     /**
      * NOTE: This method is not currently recommended for public use.
      * The internal tree representation is unstable and is very likely
